@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             TextView fragService = (TextView) accountView.findViewById(R.id.service_text);
             TextView fragUser = (TextView) accountView.findViewById(R.id.account_user_text);
             TextView fragPass = (TextView) accountView.findViewById(R.id.account_pass_text);
-            TextView fragID = (TextView) accountView.findViewById(R.id.debug_account_id);   fragID.setText(Integer.toString(account.id));
+            TextView fragID = (TextView) accountView.findViewById(R.id.debug_account_id);   fragID.setText(Integer.toString(account.getId()));
             // DEBUG    ^^  ^^  ^^  ^^  ^^  ^^  ^^
 
             showPass.setOnClickListener(new View.OnClickListener() {
@@ -94,37 +94,39 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Intent i = new Intent(MainActivity.this, AddAccount.class);
-                    i.putExtra("account_id",account.id);
+                    i.putExtra("account_id",account.getId());
                     startActivity(i);
                     accounts.clear();
                 }
             });
 
-            fragService.setText(account.service);
-            fragUser.setText(account.name);
-            fragPass.setText(account.password);
+            fragService.setText(account.getService());
+            fragUser.setText(account.getName());
+            fragPass.setText(account.getPassword());
 
             container.addView(accountView);
         }
     }
 
-    private void showPassword(View view){
-
-    }
-
     public void getAccounts(){
+        //  Open an instance of our database
         dbAccess = new DataInteractions(this);
+        //  And get a count of total number of accounts
         long total = getProfilesCount();
 
+        //  Iterate through each account
         for(int i = 1; i <= total; i++){
+            //  Create a new object from class Account
             Account acc = dbAccess.readDetails(i);
+            //  And add it to our HashMap of Account objects
             accounts.add(acc);
         }
-
     }
 
     public long getProfilesCount() {
+        //  Create a writeable SQLite database object from our database
         SQLiteDatabase db = dbAccess.getReadableDatabase();
+        //  Get the total number of profiles in the database
         long count = DatabaseUtils.queryNumEntries(db, DataContract.AccountEntry.TABLE_NAME);
         db.close();
 

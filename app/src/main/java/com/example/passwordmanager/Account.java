@@ -1,10 +1,19 @@
 package com.example.passwordmanager;
 
 public class Account {
-    String service;
-    String name;
-    String password;
-    int id;
+    private String service;
+    private String name;
+    private String password;
+    private int id;
+
+    public Account(String service, String name, String password, int id) {
+        this.service = service;
+        this.name = name;
+        this.password = password;
+        this.id = id;
+    }
+
+    public Account(){    }
 
     public String getService() {
         return service;

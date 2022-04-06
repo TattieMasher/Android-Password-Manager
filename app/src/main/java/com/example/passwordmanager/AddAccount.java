@@ -20,6 +20,7 @@ public class AddAccount extends AppCompatActivity {
     private ClipboardManager myClipboard;
     private ClipData myClip;
 
+    //  Object create to use my pre-defined DB actions
     DataInteractions db;
 
     Account acc;
@@ -35,8 +36,6 @@ public class AddAccount extends AppCompatActivity {
     boolean nums;
     boolean specials;
     boolean extraSpecials;
-
-    //  **  View elements to get user input **
 
     //  DB inputs
     EditText serviceName;
@@ -71,26 +70,37 @@ public class AddAccount extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_account);
 
+        //  If specific user ID was supplied, pre-load the info from that database row.
         if(id != 0){
             populateAccount(id);
-            updating = true;
+            updating = true;    //  Flag this DB entry as an update to an existing entry, not as a new one.
         }
     }
 
+    /**
+     * Used to pre-populate account details to edit
+     *
+     * @param id - unique ID (primary key) of existing database row
+     */
     private void populateAccount(int id){
+        //  Create db instance and read account details within row at key id, then store these details to a new account object.
         DataInteractions dbAccess = new DataInteractions(this);
         acc = dbAccess.readDetails(id);
 
+        //  Obtain UI elements
         serviceName = findViewById(R.id.service_text);
         username = findViewById(R.id.username_text);
         password = findViewById(R.id.password_text);
 
         //  Assign values from UI elements to relevant variables
-        serviceName.setText(acc.service);
-        username.setText(acc.name);
-        password.setText(acc.password);
+        serviceName.setText(acc.getService());
+        username.setText(acc.getName());
+        password.setText(acc.getPassword());
     }
 
+    /**
+     * Generate a password based on the selected user criteria and display it on screen.
+     */
     public void generatePassword(View view){
         passOutput = findViewById(R.id.gen_password_text);
         getPassValues();
@@ -100,6 +110,9 @@ public class AddAccount extends AppCompatActivity {
         passOutput.setText(pass.generatePassword());
     }
 
+    /**
+     * Assign values regarding password generation from the relevant UI elements.
+     */
     public void getPassValues(){
         //  Assign values to declared objects from UI elements
         capsSelect = (Switch) findViewById(R.id.switchCaps);
@@ -117,7 +130,7 @@ public class AddAccount extends AppCompatActivity {
     }
 
     /**
-     * Attempt to save the user's inputted account details to the database
+     * Attempt to save the user's inputted account details to the database.
      */
     public void saveDetails(View view){
         getUserValues();
@@ -137,19 +150,17 @@ public class AddAccount extends AppCompatActivity {
                 } else {
                     Toast.makeText(getApplicationContext(), "Entry unsuccessful", Toast.LENGTH_SHORT).show();
                 }
-            } else {    //  Tell the user if they left something blank
+            } else {    //  Tell the user if they left something blank.
                 Toast.makeText(getApplicationContext(), "You must enter a service name, username & password", Toast.LENGTH_LONG).show();
             }
         } else {
-
+            //  Attempt to update the record in question and report the result to the user.
             if(db.updateData(id, service, user, pass)){
                 Toast.makeText(getApplicationContext(), "Overwritten", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getApplicationContext(), "You must enter a service name, username & password", Toast.LENGTH_LONG).show();
             }
         }
-
-
     }
 
     /**
@@ -159,7 +170,7 @@ public class AddAccount extends AppCompatActivity {
         passOutput = findViewById(R.id.gen_password_text);
         String pass = passOutput.getText().toString();
 
-        if(pass != null){
+        if (pass != null) {
             myClipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 
             myClip = ClipData.newPlainText("text", pass);
@@ -170,7 +181,7 @@ public class AddAccount extends AppCompatActivity {
     }
 
     /**
-     * Store the user's inputs from the EditTexts on this activity
+     * Store the user's inputs from the EditTexts to the fields in this activity.
      */
     public void getUserValues(){
         //  Assign values to declared objects from UI elements
@@ -185,10 +196,10 @@ public class AddAccount extends AppCompatActivity {
     }
 
     /**
-     * Check if a string is blank and tell the user if it is
+     * Check if a string is blank and tell the user if it is.
      *
      * @param input - String to test if blank or not
-     * @return true if input parameter is blank
+     * @return - true if input parameter is blank
      */
     public boolean validateInput(String input){
         if(!TextUtils.isEmpty(input)){
